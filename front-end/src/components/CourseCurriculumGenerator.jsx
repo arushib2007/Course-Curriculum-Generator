@@ -10,7 +10,7 @@ import {
     Input,
     Box,
     Slider
-} from '@mui/material'
+} from '@mui/material';
 
 function CourseCurriculumGenerator() {
     
@@ -100,8 +100,6 @@ function CourseCurriculumGenerator() {
     function handleSubmit(e) {
         e.preventDefault();
 
-        console.log("test");
-
         setIsLoading(true);
 
         fetch('http://127.0.0.1:5000/handle_submit', {
@@ -120,10 +118,16 @@ function CourseCurriculumGenerator() {
         })
         .then(res => { 
             setIsSubmitted(true);
-            return res.json()
+            // console.log(res.text())
+            return res.text();
         })
-        .then(data => {
-            setResults(data);
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            const paragraphElement = doc.querySelector('p').innerText;
+
+            setResults(paragraphElement);
             setIsLoading(false);
             // console.log(data);
         })
@@ -131,6 +135,11 @@ function CourseCurriculumGenerator() {
             setIsLoading(false);
             console.error(res);
         });
+    }
+
+    function handleConvertToPDF() {
+        // const PDFDocument = require('pdfkit');
+        // const doc = new PDFDocument;
     }
     
     return (
@@ -147,12 +156,16 @@ function CourseCurriculumGenerator() {
 
                         <br />
                         <br />
-                        <Button variant="contained" onClick={() => console.log("test")}>Convert to PDF</Button>
+                        <Button variant="contained" onClick={handleConvertToPDF()}>Convert to PDF</Button>
                         
                         <br />
                         <br />
                         <Button variant="contained">
-                            <Link style={{textDecoration: 'none'}} to="/quiz_generator">
+                            <Link 
+                                style={{textDecoration: 'none'}} 
+                                to="/quiz_generator"
+                                state={{chapters}}
+                            >
                                 Quiz Generator
                             </Link>
                         </Button>

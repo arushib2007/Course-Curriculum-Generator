@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
@@ -68,7 +68,7 @@ def handle_submit():
         final_format = final_exam_or_project)  
 
     agent_response = agent_chain.run(prompt)
-    return jsonify(agent_response)
+    return render_template('results.html', agent_response=agent_response)
 
     # prompt_template(subject, difficulty, weeks, chapters, midterms, final_exam_or_project)
 
