@@ -1,6 +1,11 @@
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS, cross_origin
 
+# import pdfkit
+
+# path_wkhtmltopdf = 'C:\\Program Files\\wkhtmltopdf'
+# config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -72,14 +77,12 @@ def handle_submit():
 
     # prompt_template(subject, difficulty, weeks, chapters, midterms, final_exam_or_project)
 
-# To Do: Handle Conversion of JSON Response to PDF
+# # To Do: Handle Conversion of JSON Response to PDF
 # @app.route("/handle_pdf", methods = ['POST'])
 # @cross_origin()
 # def handle_pdf():
-# pdfkit.from_string(agent_response, 'agent_response.pdf')
-# import pdfkit
-
-
+#     html = '<h1>Testing</h1>'
+#     return pdfkit.from_string(html, 'response.pdf', configuration=config)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -138,8 +138,37 @@ function CourseCurriculumGenerator() {
     }
 
     function handleConvertToPDF() {
-        // const PDFDocument = require('pdfkit');
-        // const doc = new PDFDocument;
+        fetch('http://127.0.0.1:5000/handle_pdf', {
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            method: "POST",
+            body: JSON.stringify({
+                results: results
+            })
+        })
+        .then(res => { 
+            // setIsSubmitted(true);
+            // console.log(res.text())
+            return res.text();
+        })
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            const paragraphElement = doc.querySelector('p').innerText;
+
+            setResults(paragraphElement);
+            setIsLoading(false);
+            // console.log(data);
+        })
+        .catch((res) => { 
+            setIsLoading(false);
+            console.error(res);
+        });
+
+        console.log("test");
     }
     
     return (
@@ -150,33 +179,33 @@ function CourseCurriculumGenerator() {
 
             <div>
                 {isSubmitted ? (
-                    <>
-                        {/* TO DO: Determine how to format string response from Back End in Front End */}
-                        {results}
+                        <>
+                            {/* TO DO: Determine how to format string response from Back End in Front End */}
+                            {results}
 
-                        <br />
-                        <br />
-                        <Button variant="contained" onClick={handleConvertToPDF()}>Convert to PDF</Button>
-                        
-                        <br />
-                        <br />
-                        <Button variant="contained">
-                            <Link 
-                                style={{textDecoration: 'none'}} 
-                                to="/quiz_generator"
-                                state={{chapters}}
-                            >
-                                Quiz Generator
-                            </Link>
-                        </Button>
-                        <br />
-                        <br />
-                        <Button variant="contained">
-                            <Link style={{textDecoration: 'none'}} to="/study_material_generator">
-                                Study Material Generator
-                            </Link>
-                        </Button>
-                    </>
+                            <br />
+                            <br />
+                            <Button variant="contained" onClick={handleConvertToPDF}>Convert to PDF</Button>
+                            
+                            <br />
+                            <br />
+                            <Button variant="contained">
+                                <Link 
+                                    style={{textDecoration: 'none'}} 
+                                    to="/quiz_generator"
+                                    state={{chapters}}
+                                >
+                                    Quiz Generator
+                                </Link>
+                            </Button>
+                            <br />
+                            <br />
+                            <Button variant="contained">
+                                <Link style={{textDecoration: 'none'}} to="/study_material_generator">
+                                    Study Material Generator
+                                </Link>
+                            </Button>
+                        </>
                 ) : (
                     <Box width={750}>
                         <form onSubmit={handleSubmit} fullWidth>
