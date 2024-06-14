@@ -137,39 +137,39 @@ function CourseCurriculumGenerator() {
         });
     }
 
-    function handleConvertToPDF() {
-        fetch('http://127.0.0.1:5000/handle_pdf', {
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            method: "POST",
-            body: JSON.stringify({
-                results: results
-            })
-        })
-        .then(res => { 
-            // setIsSubmitted(true);
-            // console.log(res.text())
-            return res.text();
-        })
-        .then(html => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
+    // function handleConvertToPDF() {
+    //     fetch('http://127.0.0.1:5000/handle_pdf', {
+    //         headers: {
+    //           'Accept': 'application/json',
+    //           'Content-Type': 'application/json'
+    //         },
+    //         method: "POST",
+    //         body: JSON.stringify({
+    //             results: results
+    //         })
+    //     })
+    //     .then(res => { 
+    //         // setIsSubmitted(true);
+    //         // console.log(res.text())
+    //         return res.text();
+    //     })
+    //     .then(html => {
+    //         const parser = new DOMParser();
+    //         const doc = parser.parseFromString(html, 'text/html');
 
-            const paragraphElement = doc.querySelector('p').innerText;
+    //         const paragraphElement = doc.querySelector('p').innerText;
 
-            setResults(paragraphElement);
-            setIsLoading(false);
-            // console.log(data);
-        })
-        .catch((res) => { 
-            setIsLoading(false);
-            console.error(res);
-        });
+    //         setResults(paragraphElement);
+    //         setIsLoading(false);
+    //         // console.log(data);
+    //     })
+    //     .catch((res) => { 
+    //         setIsLoading(false);
+    //         console.error(res);
+    //     });
 
-        console.log("test");
-    }
+    //     console.log("test");
+    // }
     
     return (
         <>
@@ -185,7 +185,7 @@ function CourseCurriculumGenerator() {
 
                             <br />
                             <br />
-                            <Button variant="contained" onClick={handleConvertToPDF}>Convert to PDF</Button>
+                            {/* <Button variant="contained" onClick={handleConvertToPDF}>Convert to PDF</Button> */}
                             
                             <br />
                             <br />
@@ -193,7 +193,10 @@ function CourseCurriculumGenerator() {
                                 <Link 
                                     style={{textDecoration: 'none'}} 
                                     to="/quiz_generator"
-                                    state={{chapters}}
+                                    state={{
+                                        chapters: chapters,
+                                        results: results
+                                    }}
                                 >
                                     Quiz Generator
                                 </Link>

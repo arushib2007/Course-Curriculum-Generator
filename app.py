@@ -46,6 +46,11 @@ def prompt_template(course_topic, num_weeks, num_chapters, num_tests, final_form
     
     return prompt
 
+def quiz_prompt_template(results):
+    prompt = f"Please pull a simple bullet list of only the chapter titles from {results}. Each item in the list should only contain the chapter number and title. No other information should be included."
+
+    return prompt
+
 @app.route("/")
 def home():
     return "Welcome to My App"
@@ -83,6 +88,19 @@ def handle_submit():
 # def handle_pdf():
 #     html = '<h1>Testing</h1>'
 #     return pdfkit.from_string(html, 'response.pdf', configuration=config)
+
+@app.route('/generate_quiz', methods= ['POST'])
+@cross_origin()
+def generate_quiz():
+    data = request.get_json()
+    chapters = data['chapters']
+
+    prompt = quiz_prompt_template(chapters)
+
+    agent_response = agent_chain.run(prompt)
+
+    return render_template('results.html', agent_response=agent_response)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
