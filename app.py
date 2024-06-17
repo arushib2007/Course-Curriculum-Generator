@@ -47,8 +47,20 @@ def prompt_template(course_topic, num_weeks, num_chapters, num_tests, final_form
     return prompt
 
 def quiz_prompt_template(results):
-    prompt = f"Please pull a simple bullet list of only the chapter titles from {results}. Each item in the list should only contain the chapter number and title. No other information should be included."
+    prompt = f"Please pull a simple bullet list of the main conceps in {results}. Each item in the list should only contain one short sentence and be separated by an asterisk (*)."
 
+    return prompt
+
+def quiz_generate_template(topic):
+
+    prompt = f"""You are an experienced quiz generator chatbot. Provided the course material, generate Advanced Placement (AP) style multiple choice quiz questions for a student and ask them. 
+    Once the user provides you with the answers in the same order, grade their quiz. Remember, this quiz MUST HAVE 5 questions. 
+    At the end of the quiz, provide meaningful feedback to the student along with their grade.
+    [TOPIC]
+    {topic}
+    [END OF TOPIC]
+    """
+    
     return prompt
 
 @app.route("/")
@@ -101,6 +113,17 @@ def generate_quiz():
 
     return render_template('results.html', agent_response=agent_response)
 
+@app.route('/render_quiz', methods = ['POST'])
+@cross_origin()
+def render_quiz():
+    data = request.get_json()
+    topic = data['topic']
+
+    prompt = quiz_generate_template(topic)
+
+    agent_response = agent_chain.run(prompt)
+
+    return render_template("results.html", agent_response=agent_response)
 
 if __name__ == '__main__':
     app.run(debug=True)

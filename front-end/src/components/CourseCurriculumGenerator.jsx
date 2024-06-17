@@ -194,7 +194,6 @@ function CourseCurriculumGenerator() {
                                     style={{textDecoration: 'none'}} 
                                     to="/quiz_generator"
                                     state={{
-                                        chapters: chapters,
                                         results: results
                                     }}
                                 >
