@@ -63,6 +63,11 @@ def quiz_generate_template(topic):
     
     return prompt
 
+def submit_quiz_template(quiz_content, first_answer, second_answer, third_answer, fourth_answer, fifth_answer):
+    prompt = f"Here is my quiz: {quiz_content}. Here are my answers: {first_answer, second_answer, third_answer, fourth_answer, fifth_answer}. Please provide me with my results."
+
+    return prompt
+
 @app.route("/")
 def home():
     return "Welcome to My App"
@@ -121,6 +126,31 @@ def render_quiz():
 
     prompt = quiz_generate_template(topic)
 
+    agent_response = agent_chain.run(prompt)
+
+    return render_template("results.html", agent_response=agent_response)
+
+@app.route('/submit_quiz', methods = ['POST'])
+@cross_origin
+def submit_quiz():
+    data = request.get_json()
+
+    quiz_content = data['quizContent']
+    first_answer = data['firstAnswer']
+    second_answer = data['secondAnswer']
+    third_answer = data['thirdAnswer']
+    fourth_answer = data['fourthAnswer']
+    fifth_answer = data['fifthAnswer']
+
+    prompt = submit_quiz_template(
+            quiz_content=quiz_content, 
+            first_answer=first_answer, 
+            second_answer=second_answer, 
+            third_answer=third_answer, 
+            fourth_answer=fourth_answer, 
+            fifth_answer=fifth_answer
+        )
+    
     agent_response = agent_chain.run(prompt)
 
     return render_template("results.html", agent_response=agent_response)

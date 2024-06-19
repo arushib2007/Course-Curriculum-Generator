@@ -16,9 +16,9 @@ function CourseCurriculumGenerator() {
     
     // States
     const [ subject, setSubject ] = useState("");
-    const [ weeks, setWeeks ] = useState("");
-    const [ chapters, setChapters ] = useState("");
-    const [ tests, setTests ] = useState("");
+    const [ weeks, setWeeks ] = useState(1);
+    const [ chapters, setChapters ] = useState(1);
+    const [ tests, setTests ] = useState(0);
     const [ finalExamOrProject, setFinalExamOrProject ] = useState("");
     const [ isSubmitted, setIsSubmitted ] = useState(false);
     const [ isLoading, setIsLoading ] = useState(false);
