@@ -84,7 +84,7 @@ function QuizGenerator() {
 
     return (
         <>
-            <h1>QuizGenerator Component</h1>
+            <h1>Quiz Generator</h1>
             {/* 
             
                 Generate Selection Mechanism for the User 

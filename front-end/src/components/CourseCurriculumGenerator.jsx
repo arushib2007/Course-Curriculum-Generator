@@ -26,8 +26,8 @@ function CourseCurriculumGenerator() {
 
     const weekMarks = [
         {
-          value: 0,
-          label: '0',
+          value: 1,
+          label: '1',
         },
         {
           value: 10,
@@ -173,8 +173,9 @@ function CourseCurriculumGenerator() {
     
     return (
         <>
-            <h1>Course Curriculum Generator</h1>
-                
+            <h1>Student Agenda Generator</h1>
+            <h5>This generator helps you create a study agenda for the course that you select, allowing you to have a better and more effective studying experience! To use this generator, just select the course and final exam format and drag the blue dot for the number of weeks, chapters and tests. </h5>
+
             <br />
 
             <div>
@@ -235,7 +236,7 @@ function CourseCurriculumGenerator() {
                                     step={1}
                                     valueLabelDisplay="auto"
                                     marks={weekMarks}
-                                    min={0}
+                                    min={1}
                                     max={40}
                                 /> 
                             {/* </ Box> */}

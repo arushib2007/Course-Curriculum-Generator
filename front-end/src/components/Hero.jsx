@@ -36,7 +36,7 @@ export default function Hero() {
               fontSize: 'clamp(3.5rem, 10vw, 4rem)',
             }}
           >
-            Welcome to QuizWhiz AI!
+            Welcome to StudyBuddyAI!
           </Typography>
         </Stack>
       </Container>

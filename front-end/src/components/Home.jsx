@@ -13,7 +13,7 @@ function Home() {
             <Stack spacing={2} direction="row">
                 <Button variant="contained">
                     <Link style={{textDecoration: 'none'}} to="/course_curriculum_generator">
-                        Course Curriculum Generator
+                        Student Agenda Generator
                     </Link>
                 </Button>
 
