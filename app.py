@@ -26,7 +26,7 @@ load_dotenv()
 API_KEY = os.getenv('OPENAI_API_KEY')
 
 llm=ChatOpenAI(model="gpt-4-turbo-preview", temperature=0, frequency_penalty=0, presence_penalty=0, 
-               streaming=True, callbacks=[StreamingStdOutCallbackHandler()])
+               streaming=False, callbacks=[StreamingStdOutCallbackHandler()])
 
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import ConversationChain

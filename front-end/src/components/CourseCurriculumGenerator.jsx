@@ -10,6 +10,8 @@ import {
   Input,
   Box,
   Slider,
+  CircularProgress,
+  Typography
 } from '@mui/material'
 
 function CourseCurriculumGenerator() {
@@ -121,12 +123,13 @@ function CourseCurriculumGenerator() {
         return res.text()
       })
       .then((html) => {
-        const parser = new DOMParser()
-        const doc = parser.parseFromString(html, 'text/html')
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
 
-        const paragraphElement = doc.querySelector('p').innerText
+        const paragraphElement = doc.querySelector('p').innerText;
 
-        setResults(paragraphElement)
+        const formattedResults = formatResults(paragraphElement);
+        setResults(formattedResults)
         setIsLoading(false)
         // console.log(data);
       })
@@ -134,6 +137,24 @@ function CourseCurriculumGenerator() {
         setIsLoading(false)
         console.error(res)
       })
+  }
+
+  function formatResults(content) {
+    const myArray = content.split("###");
+    
+    const Items = myArray.map((item, index) => {
+      return (
+        <Typography variant="body1">{item}</Typography>
+      );
+    }); 
+
+    console.log(myArray);
+
+    return (
+      <>
+        <Items />
+      </>
+    )
   }
 
   // function handleConvertToPDF() {
@@ -186,7 +207,7 @@ function CourseCurriculumGenerator() {
       <div>
         {isLoading ? (
           // Render loading state
-          <div>Loading...</div>
+          <CircularProgress / >
         ) : isSubmitted ? (
           <>
             {/* TO DO: Determine how to format string response from Back End in Front End */}
