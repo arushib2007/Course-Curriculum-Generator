@@ -201,25 +201,21 @@ function QuizGenerator() {
           <br />
         </>
       ) : (
-        results.map(
-          (item, index) =>
-            index !== 0 &&
-            index !== results.length - 1 && (
-              <div key={index}>
-                {selectedSubject !== item && ( // Render button only if it's not the selected subject
-                  <Box mb={2}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={generateQuiz}
-                    >
-                      {item}
-                    </Button>
-                  </Box>
-                )}
-              </div>
-            )
-        )
+        results.map((item, index) => (
+          <div key={index}>
+            {selectedSubject !== item && ( // Render button only if it's not the selected subject
+              <Box mb={2}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={generateQuiz}
+                >
+                  {item}
+                </Button>
+              </Box>
+            )}
+          </div>
+        ))
       )}
 
       <Box mt={2}>
