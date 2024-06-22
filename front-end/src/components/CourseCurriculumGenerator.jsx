@@ -2,18 +2,15 @@ import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import {
   Button,
-  TextField,
   FormControl,
   Select,
   MenuItem,
   InputLabel,
-  Input,
   Box,
   Slider,
   CircularProgress,
   Typography,
   Paper,
-  Divider,
 } from '@mui/material'
 
 function CourseCurriculumGenerator() {
@@ -84,14 +81,38 @@ function CourseCurriculumGenerator() {
         setResults(formattedResults)
         setIsLoading(false)
       })
-      .catch((res) => {
+      .catch((error) => {
         setIsLoading(false)
-        console.error(res)
+        console.error('Error fetching data:', error)
       })
   }
 
   function formatResults(content) {
-    return content.split('###')
+    // Split content into parts based on weeks and chapters
+    const weeksContent = content.split('###')
+    const formattedResults = []
+
+    // Loop through the number of weeks
+    for (let i = 0; i < weeks; i++) {
+      if (i < weeksContent.length) {
+        const weekContent = weeksContent[i].trim()
+        const chaptersContent = weekContent.split('---')
+
+        // Concatenate all chapters content for the current week
+        const formattedWeekContent = chaptersContent
+          .slice(0, chapters)
+          .map(
+            (chapterContent, index) =>
+              `Week ${i + 1}, Chapter ${index + 1}: ${chapterContent}`
+          )
+
+        formattedResults.push(formattedWeekContent.join('\n'))
+      } else {
+        formattedResults.push('')
+      }
+    }
+
+    return formattedResults
   }
 
   return (
@@ -107,32 +128,34 @@ function CourseCurriculumGenerator() {
 
       <br />
 
-      <div>
+      <Box width={750}>
         {isLoading ? (
           // Render loading state
           <CircularProgress />
         ) : isSubmitted ? (
           <>
-            {results.map((result, index) => (
-              <Box key={index} mt={2} mb={2}>
-                <Typography variant="h6" gutterBottom>
-                  Week {index + 1}
+            <Paper
+              elevation={3}
+              style={{ padding: '16px', marginBottom: '8px' }}
+            >
+              <Typography variant="h6" gutterBottom>
+                Study Plan
+              </Typography>
+              {results.map((result, index) => (
+                <Typography
+                  key={index}
+                  variant="body1"
+                  style={{ whiteSpace: 'pre-line' }}
+                >
+                  {result}
                 </Typography>
-                <Paper elevation={3} style={{ padding: '16px' }}>
-                  <Typography variant="body1">{result}</Typography>
-                </Paper>
-              </Box>
-            ))}
+              ))}
+            </Paper>
 
-            <br />
-            <br />
-            {/* <Button variant="contained" onClick={handleConvertToPDF}>Convert to PDF</Button> */}
-
-            <br />
             <br />
             <Button variant="contained">
               <Link
-                style={{ textDecoration: 'none' }}
+                style={{ textDecoration: 'none', color: 'inherit' }}
                 to="/quiz_generator"
                 state={{ results }}
               >
@@ -143,7 +166,7 @@ function CourseCurriculumGenerator() {
             <br />
             <Button variant="contained">
               <Link
-                style={{ textDecoration: 'none' }}
+                style={{ textDecoration: 'none', color: 'inherit' }}
                 to="/study_material_generator"
               >
                 Study Material Generator
@@ -151,96 +174,97 @@ function CourseCurriculumGenerator() {
             </Button>
           </>
         ) : (
-          <Box width={750}>
-            <form onSubmit={handleSubmit} fullWidth>
-              <FormControl fullWidth>
-                <InputLabel id="subject-input">Subject</InputLabel>
-                <Select
-                  labelId="subject-input"
-                  label="Subject"
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                >
-                  <MenuItem value="AP Statistics">AP Statistics</MenuItem>
-                  <MenuItem value="AP Chemistry">AP Chemistry</MenuItem>
-                  <MenuItem value="AP Calculus BC">AP Calculus BC</MenuItem>
-                  <MenuItem value="AP World History">AP World History</MenuItem>
-                  <MenuItem value="AP English Literature">
-                    AP English Literature
-                  </MenuItem>
-                  <MenuItem value="AP Computer Science A">
-                    AP Computer Science A
-                  </MenuItem>
-                </Select>
-              </FormControl>
-              <br />
-              <label>Number of Weeks</label>
-              <Slider
-                aria-label="Number of Weeks"
-                onChange={(e) => setWeeks(e.target.value)}
-                value={weeks}
-                defaultValue={1}
-                step={1}
-                valueLabelDisplay="auto"
-                marks={weekMarks}
-                min={1}
-                max={40}
-              />
-              <br />
-              <label>Number of Chapters</label>
-              <Slider
-                aria-label="Number of Chapters"
-                onChange={(e) => setChapters(e.target.value)}
-                value={chapters}
-                defaultValue={1}
-                step={1}
-                valueLabelDisplay="auto"
-                marks={chapterMarks}
-                min={1}
-                max={25}
-              />
-              <label>Number of Tests</label>
-              <br />
-              <Slider
-                aria-label="Number of Tests"
-                onChange={(e) => setTests(e.target.value)}
-                value={tests}
-                defaultValue={0}
-                step={1}
-                valueLabelDisplay="auto"
-                marks={testMarks}
-                min={0}
-                max={3}
-              />
-              <br />
-              <br />
-              <FormControl fullWidth>
-                <InputLabel id="exam-or-project-input">
-                  Final Exam or Project?
-                </InputLabel>
-                <Select
-                  label="Final Exam or Project"
-                  labelId="exam-or-project-input"
-                  value={finalExamOrProject}
-                  onChange={(e) => setFinalExamOrProject(e.target.value)}
-                >
-                  <MenuItem value="">Choose One</MenuItem>
-                  <MenuItem value="Final Exam">Final Exam</MenuItem>
-                  <MenuItem value="Project">Project</MenuItem>
-                </Select>
-              </FormControl>
-              <br />
-              <br />
-              <Button variant="contained" type="submit">
-                Submit
-              </Button>
-            </form>
+          <form onSubmit={handleSubmit} fullWidth>
+            <FormControl fullWidth>
+              <InputLabel id="subject-input">Subject</InputLabel>
+              <Select
+                labelId="subject-input"
+                label="Subject"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+              >
+                <MenuItem value="AP Statistics">AP Statistics</MenuItem>
+                <MenuItem value="AP Chemistry">AP Chemistry</MenuItem>
+                <MenuItem value="AP Calculus BC">AP Calculus BC</MenuItem>
+                <MenuItem value="AP World History">AP World History</MenuItem>
+                <MenuItem value="AP English Literature">
+                  AP English Literature
+                </MenuItem>
+                <MenuItem value="AP Computer Science A">
+                  AP Computer Science A
+                </MenuItem>
+              </Select>
+            </FormControl>
             <br />
-          </Box>
+            <label>Number of Weeks</label>
+            <Slider
+              aria-label="Number of Weeks"
+              onChange={(e) => setWeeks(e.target.value)}
+              value={weeks}
+              defaultValue={1}
+              step={1}
+              valueLabelDisplay="auto"
+              marks={weekMarks}
+              min={1}
+              max={40}
+            />
+            <br />
+            <label>Number of Chapters</label>
+            <Slider
+              aria-label="Number of Chapters"
+              onChange={(e) => setChapters(e.target.value)}
+              value={chapters}
+              defaultValue={1}
+              step={1}
+              valueLabelDisplay="auto"
+              marks={chapterMarks}
+              min={1}
+              max={25}
+            />
+            <label>Number of Tests</label>
+            <br />
+            <Slider
+              aria-label="Number of Tests"
+              onChange={(e) => setTests(e.target.value)}
+              value={tests}
+              defaultValue={0}
+              step={1}
+              valueLabelDisplay="auto"
+              marks={testMarks}
+              min={0}
+              max={4}
+            />
+            <br />
+            <br />
+            <FormControl fullWidth>
+              <InputLabel id="exam-or-project-input">
+                Final Exam or Project?
+              </InputLabel>
+              <Select
+                label="Final Exam or Project"
+                labelId="exam-or-project-input"
+                value={finalExamOrProject}
+                onChange={(e) => setFinalExamOrProject(e.target.value)}
+              >
+                <MenuItem value="">Choose One</MenuItem>
+                <MenuItem value="Final Exam">Final Exam</MenuItem>
+                <MenuItem value="Project">Project</MenuItem>
+              </Select>
+            </FormControl>
+            <br />
+            <br />
+            <Button variant="contained" type="submit">
+              Submit
+            </Button>
+          </form>
         )}
-      </div>
+      </Box>
       <br />
-      <Link to="/">Go Back</Link>
+      <Button variant="contained">
+        <Link style={{ textDecoration: 'none', color: 'inherit' }} to="/">
+          Go Back
+        </Link>
+      </Button>
     </>
   )
 }
