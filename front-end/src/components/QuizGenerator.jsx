@@ -95,7 +95,9 @@ function QuizGenerator() {
     }
   }
 
-  function submitQuiz() {
+  function submitQuiz(e) {
+    e.preventDefault();
+    
     setLoadingQuiz(true)
 
     fetch('http://127.0.0.1:5000/submit_quiz', {
@@ -119,7 +121,7 @@ function QuizGenerator() {
         const doc = parser.parseFromString(html, 'text/html')
         const paragraphElement = doc.querySelector('p').innerText
         const myArray = paragraphElement.split('**')
-        setQuizResults(myArray)
+        setQuizResults(myArray.split(' '))
         setLoadingQuiz(false)
       })
       .catch((error) => {
@@ -171,6 +173,8 @@ function QuizGenerator() {
         </Button>
       )}
       <br />
+
+      {quizResults}
 
       {loadingSubjects ? (
         <>
