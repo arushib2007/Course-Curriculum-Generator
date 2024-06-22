@@ -17,6 +17,7 @@ function QuizGenerator() {
   const [fifthAnswer, setFifthAnswer] = useState('')
   const [showSubmitButton, setShowSubmitButton] = useState(false)
   const [gradedResponse, setGradedResponse] = useState('')
+  const [selectedSubject, setSelectedSubject] = useState(null) // State to track selected subject
 
   function requestChapters() {
     setLoadingSubjects(true)
@@ -69,6 +70,7 @@ function QuizGenerator() {
         setQuizContent(myArray)
         setLoadingQuiz(false)
         setShowSubmitButton(true) // Show submit button after quiz is rendered
+        setSelectedSubject(topic) // Mark the selected subject
       })
       .catch((error) => {
         console.error('Error fetching quiz:', error)
@@ -126,6 +128,8 @@ function QuizGenerator() {
         setGradedResponse(myArray)
         setLoadingQuiz(false)
         setShowSubmitButton(false) // Hide submit button after submission
+        setQuizContent([]) // Clear quiz content
+        setSelectedSubject(null) // Reset selected subject
       })
       .catch((error) => {
         console.error('Error submitting quiz:', error)
@@ -152,36 +156,38 @@ function QuizGenerator() {
         </>
       )}
 
-      {!loadingQuiz &&
-        quizContent.map((item, index) => (
-          <div key={index}>
-            {index % 2 === 0 && index !== 0 ? (
-              <>
-                <p>{item}</p>
-                <input
-                  onChange={(e) => handleInput(e, index)}
-                  placeholder="Add answer here..."
-                />
-                <br />
-              </>
-            ) : (
-              <h3>{item}</h3>
-            )}
-          </div>
-        ))}
+      {!loadingQuiz && quizContent.length > 0 && (
+        <>
+          {quizContent.map((item, index) => (
+            <div key={index}>
+              {index % 2 === 0 && index !== 0 ? (
+                <>
+                  <p>{item}</p>
+                  <input
+                    onChange={(e) => handleInput(e, index)}
+                    placeholder="Add answer here..."
+                  />
+                  <br />
+                </>
+              ) : (
+                <h3>{item}</h3>
+              )}
+            </div>
+          ))}
 
-      {showSubmitButton && (
-        <Button variant="contained" color="primary" onClick={submitQuiz}>
-          Submit Quiz
-        </Button>
+          {showSubmitButton && (
+            <Button variant="contained" color="primary" onClick={submitQuiz}>
+              Submit Quiz
+            </Button>
+          )}
+        </>
       )}
-      <br />
 
       {gradedResponse && (
-        <div>
+        <Box mt={2} p={2} border={1} borderColor="primary.main">
           <Typography variant="h6">Graded Response:</Typography>
           <Typography variant="body1">{gradedResponse}</Typography>
-        </div>
+        </Box>
       )}
 
       {loadingSubjects ? (
@@ -199,15 +205,17 @@ function QuizGenerator() {
             index !== 0 &&
             index !== results.length - 1 && (
               <div key={index}>
-                <Box mb={2}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={generateQuiz}
-                  >
-                    {item}
-                  </Button>
-                </Box>
+                {selectedSubject !== item && ( // Render button only if it's not the selected subject
+                  <Box mb={2}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={generateQuiz}
+                    >
+                      {item}
+                    </Button>
+                  </Box>
+                )}
               </div>
             )
         )
