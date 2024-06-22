@@ -1,199 +1,210 @@
-import { Link, useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { Button } from '@mui/material';
+import { Link, useLocation } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Button, CircularProgress, Box, Typography } from '@mui/material'
 
 function QuizGenerator() {
-    let { state } = useLocation();
+  let { state } = useLocation()
 
-    const [ results, setResults ] = useState([]);
-    const [ loading, setIsLoading ] = useState(false);
-    const [ quizContent, setQuizContent ] = useState([]);
-    const [ quizResults, setQuizResults ] = useState("");
-    
-    const [ firstAnswer, setFirstAnswer ] = useState("");
-    const [ secondAnswer, setSecondAnswer ] = useState("");
-    const [ thirdAnswer, setThirdAnswer ] = useState("");
-    const [ fourthAnswer, setFourthAnswer ] = useState("");
-    const [ fifthAnswer, setFifthAnswer ] = useState("");
+  const [results, setResults] = useState([])
+  const [isLoadingSubjects, setIsLoadingSubjects] = useState(false)
+  const [isLoadingQuiz, setIsLoadingQuiz] = useState(false)
+  const [quizContent, setQuizContent] = useState([])
+  const [quizResults, setQuizResults] = useState('')
+  const [firstAnswer, setFirstAnswer] = useState('')
+  const [secondAnswer, setSecondAnswer] = useState('')
+  const [thirdAnswer, setThirdAnswer] = useState('')
+  const [fourthAnswer, setFourthAnswer] = useState('')
+  const [fifthAnswer, setFifthAnswer] = useState('')
+  const [subjectSelected, setSubjectSelected] = useState(false)
 
-    function requestChapters() {
-        fetch('http://127.0.0.1:5000/generate_quiz', {
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            method: "POST",
-            body: JSON.stringify({
-                chapters: state.results
-            })
-        })
-        .then(res => { 
-            return res.text();
-        })
-        .then(html => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
+  function requestChapters() {
+    setIsLoadingSubjects(true)
 
-            const paragraphElement = doc.querySelector('p').innerText;
+    fetch('http://127.0.0.1:5000/generate_quiz', {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        chapters: state.results,
+      }),
+    })
+      .then((res) => res.text())
+      .then((html) => {
+        const parser = new DOMParser()
+        const doc = parser.parseFromString(html, 'text/html')
+        const paragraphElement = doc.querySelector('p').innerText
 
-            // Convert content in paragraphElement to an Array of items
-            const myArray = paragraphElement.split('*');
+        // Convert content in paragraphElement to an Array of items
+        const myArray = paragraphElement.split('*')
+        setResults(myArray)
 
-            // Set return value of above .split invocation (Array) as value
-            // for results
-            setResults(myArray);
+        setIsLoadingSubjects(false)
+      })
+      .catch((res) => {
+        console.error(res)
+        setIsLoadingSubjects(false)
+      })
+  }
 
-            setIsLoading(false);
-            // console.log(data);
-        })
-        .catch((res) => {
-            console.error(res);
-        });
+  function generateQuiz(e) {
+    setIsLoadingQuiz(true)
+    let topic = e.target.innerText
+
+    fetch('http://127.0.0.1:5000/render_quiz', {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        topic: topic,
+      }),
+    })
+      .then((res) => res.text())
+      .then((html) => {
+        const parser = new DOMParser()
+        const doc = parser.parseFromString(html, 'text/html')
+        const paragraphElement = doc.querySelector('p').innerText
+        const myArray = paragraphElement.split('**')
+
+        setQuizContent(myArray)
+        setIsLoadingQuiz(false)
+        setSubjectSelected(true)
+      })
+      .catch((res) => {
+        console.error(res)
+        setIsLoadingQuiz(false)
+      })
+  }
+
+  function handleInput(e, index) {
+    switch (index) {
+      case 2:
+        setFirstAnswer(e.target.value)
+        break
+      case 4:
+        setSecondAnswer(e.target.value)
+        break
+      case 6:
+        setThirdAnswer(e.target.value)
+        break
+      case 8:
+        setFourthAnswer(e.target.value)
+        break
+      case 10:
+        setFifthAnswer(e.target.value)
+        break
+      default:
+        break
     }
+  }
 
-    function generateQuiz(e) {
-        let topic = e.target.innerText;
-        
-        fetch('http://127.0.0.1:5000/render_quiz', {
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            method: "POST",
-            body: JSON.stringify({
-                topic: topic
-            })
-        })
-        .then(res => { 
-            return res.text();
-        })
-        .then(html => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
+  function submitQuiz() {
+    fetch('http://127.0.0.1:5000/submit_quiz', {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        quizContent: quizContent.join(' '),
+        firstAnswer: firstAnswer,
+        secondAnswer: secondAnswer,
+        thirdAnswer: thirdAnswer,
+        fourthAnswer: fourthAnswer,
+        fifthAnswer: fifthAnswer,
+      }),
+    })
+      .then((res) => res.text())
+      .then((html) => {
+        const parser = new DOMParser()
+        const doc = parser.parseFromString(html, 'text/html')
+        const paragraphElement = doc.querySelector('p').innerText
+        const myArray = paragraphElement.split('**')
 
-            const paragraphElement = doc.querySelector('p').innerText;
+        setQuizResults(myArray)
+        setIsLoadingQuiz(false)
+      })
+      .catch((res) => {
+        console.error(res)
+      })
+  }
 
-            const myArray = paragraphElement.split("**")
+  // Automatically fires requestChapters() when component loads
+  useEffect(() => {
+    requestChapters()
+  }, [])
 
-            setQuizContent(myArray);
-            setIsLoading(false);
-        })
-        .catch((res) => {
-            console.error(res);
-        });
-    }
+  return (
+    <>
+      <h1>Quiz Generator</h1>
 
-    function handleInput(e, index) {
-        switch (index) {
-            case 2:
-                setFirstAnswer(e.target.value);
-                break;
-            case 4:
-                setSecondAnswer(e.target.value);
-                break;
-            case 6:
-                setThirdAnswer(e.target.value);
-                break;
-            case 8:
-                setFourthAnswer(e.target.value);
-                break;
-            case 10:
-                setFifthAnswer(e.target.value);
-                break;
-            default:
-                break;
-        }
-    }
-
-    function submitQuiz() {
-        fetch('http://127.0.0.1:5000/submit_quiz', {
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            method: "POST",
-            body: JSON.stringify({
-                quizContent: quizContent.join(' '),
-                firstAnswer: firstAnswer,
-                secondAnswer: secondAnswer,
-                thirdAnswer: thirdAnswer,
-                fourthAnswer: fourthAnswer,
-                fifthAnswer: fifthAnswer
-            })
-        })
-        .then(res => { 
-            return res.text();
-        })
-        .then(html => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-
-            const paragraphElement = doc.querySelector('p').innerText;
-
-            const myArray = paragraphElement.split("**")
-
-            setQuizResults(myArray);
-            setIsLoading(false);
-        })
-        .catch((res) => {
-            console.error(res);
-        });
-    }
-
-    // Automatically fires requestChapters() when component loads
-    useEffect(() => {
-        requestChapters();
-    }, []);
-
-    return (
+      {isLoadingQuiz && (
         <>
-            <h1>Quiz Generator</h1>
-            {/* 
-            
-                Generate Selection Mechanism for the User 
-
-                From a Dropdown, Select the Chapter That You
-                Want to Generate a Quiz From
-            
-            */}
-
-            {quizContent.map((item, index) => (
-                <>
-                    { index % 2 == 0 && index != 0 ? (
-                        <>
-                            <p>{item}</p>
-                            <input onChange={(e) => handleInput(e, index)} placeholder="Add answer here..."></input>
-                            <br />
-                        </>
-                    ) : (
-                        <>
-                            <h1>{item}</h1>
-                        </>
-                    )}
-                </>
-            ))}
-
-            <Button variant="contained" color="primary" onClick={submitQuiz}>Submit Quiz</Button>
-            <br />
-
-            {results.map((item, index) => (
-                <>
-                    { index != 0 && index != results.length - 1 ? (
-                        <>
-                            <Button key={index} variant="contained" color="primary" onClick={generateQuiz}>
-                                {item}
-                            </Button>
-                            <br />
-                        </>
-                    ) : (
-                        null
-                    ) 
-                    }
-                </>
-            ))}
-            <Link to="/">Go Back</Link>
+          <Typography variant="body1">
+            Please allow time for results to render...
+          </Typography>
+          <CircularProgress />
         </>
-    );
+      )}
+
+      {!isLoadingQuiz &&
+        quizContent.map((item, index) => (
+          <div key={index}>
+            {index % 2 === 0 && index !== 0 ? (
+              <>
+                <p>{item}</p>
+                <input
+                  onChange={(e) => handleInput(e, index)}
+                  placeholder="Add answer here..."
+                />
+                <br />
+              </>
+            ) : (
+              <>
+                <h1>{item}</h1>
+              </>
+            )}
+          </div>
+        ))}
+
+      {subjectSelected && (
+        <Button variant="contained" color="primary" onClick={submitQuiz}>
+          Submit Quiz
+        </Button>
+      )}
+      <br />
+
+      {isLoadingSubjects ? (
+        <CircularProgress />
+      ) : (
+        results.map((item, index) => (
+          <div key={index}>
+            {index !== 0 && index !== results.length - 1 && (
+              <Box mb={2}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={generateQuiz}
+                >
+                  {item}
+                </Button>
+              </Box>
+            )}
+          </div>
+        ))
+      )}
+      <Box mt={2}>
+        <Button variant="contained">
+          <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+            Go Back
+          </Link>
+        </Button>
+      </Box>
+    </>
+  )
 }
 
-export default QuizGenerator;
+export default QuizGenerator
