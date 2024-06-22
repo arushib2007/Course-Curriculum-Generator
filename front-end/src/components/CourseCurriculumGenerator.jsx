@@ -22,7 +22,7 @@ function CourseCurriculumGenerator() {
   const [finalExamOrProject, setFinalExamOrProject] = useState('')
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [results, setResults] = useState([])
+  const [results, setResults] = useState('')
 
   const weekMarks = [
     { value: 1, label: '1' },
@@ -88,29 +88,18 @@ function CourseCurriculumGenerator() {
   }
 
   function formatResults(content) {
-    // Split content into parts based on weeks and chapters
     const weeksContent = content.split('###')
-    const formattedResults = []
-
-    // Loop through the number of weeks
-    for (let i = 0; i < weeks; i++) {
-      if (i < weeksContent.length) {
-        const weekContent = weeksContent[i].trim()
+    const formattedResults = weeksContent
+      .map((weekContent) => {
         const chaptersContent = weekContent.split('---')
-
-        // Concatenate all chapters content for the current week
-        const formattedWeekContent = chaptersContent
+        return chaptersContent
           .slice(0, chapters)
           .map(
-            (chapterContent, index) =>
-              `Week ${i + 1}, Chapter ${index + 1}: ${chapterContent}`
+            (chapterContent, index) => `Chapter ${index + 1}: ${chapterContent}`
           )
-
-        formattedResults.push(formattedWeekContent.join('\n'))
-      } else {
-        formattedResults.push('')
-      }
-    }
+          .join('\n')
+      })
+      .join('\n\n')
 
     return formattedResults
   }
@@ -130,8 +119,13 @@ function CourseCurriculumGenerator() {
 
       <Box width={750}>
         {isLoading ? (
-          // Render loading state
-          <CircularProgress />
+          <>
+            <Typography variant="body1">
+              Please allow time for results to render...
+            </Typography>
+            <br />
+            <CircularProgress />
+          </>
         ) : isSubmitted ? (
           <>
             <Paper
@@ -139,19 +133,12 @@ function CourseCurriculumGenerator() {
               style={{ padding: '16px', marginBottom: '8px' }}
             >
               <Typography variant="h6" gutterBottom>
-                Study Plan
+                Study Agenda
               </Typography>
-              {results.map((result, index) => (
-                <Typography
-                  key={index}
-                  variant="body1"
-                  style={{ whiteSpace: 'pre-line' }}
-                >
-                  {result}
-                </Typography>
-              ))}
+              <Typography variant="body1">{results}</Typography>
             </Paper>
 
+            <br />
             <br />
             <Button variant="contained">
               <Link
@@ -163,15 +150,14 @@ function CourseCurriculumGenerator() {
               </Link>
             </Button>
             <br />
-            <br />
-            <Button variant="contained">
+            {/* <Button variant="contained">
               <Link
                 style={{ textDecoration: 'none', color: 'inherit' }}
                 to="/study_material_generator"
               >
                 Study Material Generator
               </Link>
-            </Button>
+            </Button> */}
           </>
         ) : (
           <form onSubmit={handleSubmit} fullWidth>
@@ -265,6 +251,7 @@ function CourseCurriculumGenerator() {
           Go Back
         </Link>
       </Button>
+      <br />
     </>
   )
 }
