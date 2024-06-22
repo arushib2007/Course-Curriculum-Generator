@@ -15,6 +15,8 @@ function QuizGenerator() {
   const [thirdAnswer, setThirdAnswer] = useState('')
   const [fourthAnswer, setFourthAnswer] = useState('')
   const [fifthAnswer, setFifthAnswer] = useState('')
+  const [showSubmitButton, setShowSubmitButton] = useState(false)
+  const [gradedResponse, setGradedResponse] = useState('')
 
   function requestChapters() {
     setLoadingSubjects(true)
@@ -66,6 +68,7 @@ function QuizGenerator() {
         const myArray = paragraphElement.split('**')
         setQuizContent(myArray)
         setLoadingQuiz(false)
+        setShowSubmitButton(true) // Show submit button after quiz is rendered
       })
       .catch((error) => {
         console.error('Error fetching quiz:', error)
@@ -96,8 +99,7 @@ function QuizGenerator() {
   }
 
   function submitQuiz(e) {
-    e.preventDefault();
-    
+    e.preventDefault()
     setLoadingQuiz(true)
 
     fetch('http://127.0.0.1:5000/submit_quiz', {
@@ -121,8 +123,9 @@ function QuizGenerator() {
         const doc = parser.parseFromString(html, 'text/html')
         const paragraphElement = doc.querySelector('p').innerText
         const myArray = paragraphElement.split('**')
-        setQuizResults(myArray.split(' '))
+        setGradedResponse(myArray)
         setLoadingQuiz(false)
+        setShowSubmitButton(false) // Hide submit button after submission
       })
       .catch((error) => {
         console.error('Error submitting quiz:', error)
@@ -167,14 +170,19 @@ function QuizGenerator() {
           </div>
         ))}
 
-      {!loadingQuiz && (
+      {showSubmitButton && (
         <Button variant="contained" color="primary" onClick={submitQuiz}>
           Submit Quiz
         </Button>
       )}
       <br />
 
-      {quizResults}
+      {gradedResponse && (
+        <div>
+          <Typography variant="h6">Graded Response:</Typography>
+          <Typography variant="body1">{gradedResponse}</Typography>
+        </div>
+      )}
 
       {loadingSubjects ? (
         <>
@@ -191,14 +199,15 @@ function QuizGenerator() {
             index !== 0 &&
             index !== results.length - 1 && (
               <div key={index}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={generateQuiz}
-                >
-                  {item}
-                </Button>
-                <br />
+                <Box mb={2}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={generateQuiz}
+                  >
+                    {item}
+                  </Button>
+                </Box>
               </div>
             )
         )
