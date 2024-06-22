@@ -9,12 +9,7 @@ function QuizGenerator() {
   const [isLoadingSubjects, setIsLoadingSubjects] = useState(false)
   const [isLoadingQuiz, setIsLoadingQuiz] = useState(false)
   const [quizContent, setQuizContent] = useState([])
-  const [quizResults, setQuizResults] = useState('')
-  const [firstAnswer, setFirstAnswer] = useState('')
-  const [secondAnswer, setSecondAnswer] = useState('')
-  const [thirdAnswer, setThirdAnswer] = useState('')
-  const [fourthAnswer, setFourthAnswer] = useState('')
-  const [fifthAnswer, setFifthAnswer] = useState('')
+  const [answers, setAnswers] = useState([])
   const [subjectSelected, setSubjectSelected] = useState(false)
 
   function requestChapters() {
@@ -42,8 +37,8 @@ function QuizGenerator() {
 
         setIsLoadingSubjects(false)
       })
-      .catch((res) => {
-        console.error(res)
+      .catch((error) => {
+        console.error('Error fetching data:', error)
         setIsLoadingSubjects(false)
       })
   }
@@ -62,43 +57,35 @@ function QuizGenerator() {
         topic: topic,
       }),
     })
-      .then((res) => res.text())
-      .then((html) => {
-        const parser = new DOMParser()
-        const doc = parser.parseFromString(html, 'text/html')
-        const paragraphElement = doc.querySelector('p').innerText
-        const myArray = paragraphElement.split('**')
-
-        setQuizContent(myArray)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Network response was not ok')
+        }
+        return res.json() // Parse response as JSON
+      })
+      .then((data) => {
+        if (!data || !data.quizContent) {
+          throw new Error('Invalid response from server')
+        }
+        setQuizContent(data.quizContent)
+        setAnswers(Array(data.quizContent.length).fill('')) // Initialize answers array
         setIsLoadingQuiz(false)
         setSubjectSelected(true)
       })
-      .catch((res) => {
-        console.error(res)
+      .catch((error) => {
+        console.error('Error fetching quiz:', error)
         setIsLoadingQuiz(false)
+        // Log the response text for debugging
+        error.response
+          .text()
+          .then((text) => console.log('Server response:', text))
       })
   }
 
-  function handleInput(e, index) {
-    switch (index) {
-      case 2:
-        setFirstAnswer(e.target.value)
-        break
-      case 4:
-        setSecondAnswer(e.target.value)
-        break
-      case 6:
-        setThirdAnswer(e.target.value)
-        break
-      case 8:
-        setFourthAnswer(e.target.value)
-        break
-      case 10:
-        setFifthAnswer(e.target.value)
-        break
-      default:
-        break
-    }
+  function handleInput(index, answer) {
+    const updatedAnswers = [...answers]
+    updatedAnswers[index] = answer.toUpperCase() // Ensure answer is uppercase
+    setAnswers(updatedAnswers)
   }
 
   function submitQuiz() {
@@ -109,26 +96,17 @@ function QuizGenerator() {
       },
       method: 'POST',
       body: JSON.stringify({
-        quizContent: quizContent.join(' '),
-        firstAnswer: firstAnswer,
-        secondAnswer: secondAnswer,
-        thirdAnswer: thirdAnswer,
-        fourthAnswer: fourthAnswer,
-        fifthAnswer: fifthAnswer,
+        quizContent: quizContent,
+        answers: answers,
       }),
     })
-      .then((res) => res.text())
-      .then((html) => {
-        const parser = new DOMParser()
-        const doc = parser.parseFromString(html, 'text/html')
-        const paragraphElement = doc.querySelector('p').innerText
-        const myArray = paragraphElement.split('**')
-
-        setQuizResults(myArray)
-        setIsLoadingQuiz(false)
+      .then((res) => res.json()) // Assuming server returns JSON
+      .then((data) => {
+        console.log('Quiz results:', data.results)
+        // Handle quiz results as needed
       })
-      .catch((res) => {
-        console.error(res)
+      .catch((error) => {
+        console.error('Error submitting quiz:', error)
       })
   }
 
@@ -144,29 +122,24 @@ function QuizGenerator() {
       {isLoadingQuiz && (
         <>
           <Typography variant="body1">
-            Please allow time for results to render...
+            Please allow time for quiz to render...
           </Typography>
+          <br />
           <CircularProgress />
         </>
       )}
 
       {!isLoadingQuiz &&
-        quizContent.map((item, index) => (
+        quizContent.map((question, index) => (
           <div key={index}>
-            {index % 2 === 0 && index !== 0 ? (
-              <>
-                <p>{item}</p>
-                <input
-                  onChange={(e) => handleInput(e, index)}
-                  placeholder="Add answer here..."
-                />
-                <br />
-              </>
-            ) : (
-              <>
-                <h1>{item}</h1>
-              </>
-            )}
+            <h3>{question}</h3>
+            <input
+              type="text"
+              value={answers[index] || ''}
+              onChange={(e) => handleInput(index, e.target.value)}
+              placeholder="Enter answer (A, B, C, D, E)"
+            />
+            <br />
           </div>
         ))}
 
@@ -178,8 +151,16 @@ function QuizGenerator() {
       <br />
 
       {isLoadingSubjects ? (
-        <CircularProgress />
+        <>
+          <Typography variant="body1">
+            Please allow time for subjects to render...
+          </Typography>
+          <br />
+          <CircularProgress />
+          <br />
+        </>
       ) : (
+        !subjectSelected &&
         results.map((item, index) => (
           <div key={index}>
             {index !== 0 && index !== results.length - 1 && (
@@ -196,6 +177,7 @@ function QuizGenerator() {
           </div>
         ))
       )}
+
       <Box mt={2}>
         <Button variant="contained">
           <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
