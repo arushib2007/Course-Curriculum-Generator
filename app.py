@@ -64,6 +64,9 @@ def quiz_generate_template(topic):
     return prompt
 
 def submit_quiz_template(quiz_content, first_answer, second_answer, third_answer, fourth_answer, fifth_answer):
+    
+    print(quiz_content)
+    
     prompt = f"Here is my quiz: {quiz_content}. Here are my answers: {first_answer, second_answer, third_answer, fourth_answer, fifth_answer}. Please provide me with my results."
 
     return prompt
@@ -131,7 +134,7 @@ def render_quiz():
     return render_template("results.html", agent_response=agent_response)
 
 @app.route('/submit_quiz', methods = ['POST'])
-@cross_origin
+@cross_origin()
 def submit_quiz():
     data = request.get_json()
 
