@@ -11,7 +11,9 @@ import {
   Box,
   Slider,
   CircularProgress,
-  Typography
+  Typography,
+  Paper,
+  Divider,
 } from '@mui/material'
 
 function CourseCurriculumGenerator() {
@@ -23,79 +25,31 @@ function CourseCurriculumGenerator() {
   const [finalExamOrProject, setFinalExamOrProject] = useState('')
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [results, setResults] = useState('')
+  const [results, setResults] = useState([])
 
   const weekMarks = [
-    {
-      value: 1,
-      label: '1',
-    },
-    {
-      value: 10,
-      label: '10',
-    },
-    {
-      value: 20,
-      label: '20',
-    },
-    {
-      value: 30,
-      label: '30',
-    },
-    {
-      value: 40,
-      label: '40',
-    },
+    { value: 1, label: '1' },
+    { value: 10, label: '10' },
+    { value: 20, label: '20' },
+    { value: 30, label: '30' },
+    { value: 40, label: '40' },
   ]
 
   const chapterMarks = [
-    {
-      value: 1,
-      label: '1',
-    },
-    {
-      value: 5,
-      label: '5',
-    },
-    {
-      value: 10,
-      label: '10',
-    },
-    {
-      value: 15,
-      label: '15',
-    },
-    {
-      value: 20,
-      label: '20',
-    },
-    {
-      value: 25,
-      label: '25',
-    },
+    { value: 1, label: '1' },
+    { value: 5, label: '5' },
+    { value: 10, label: '10' },
+    { value: 15, label: '15' },
+    { value: 20, label: '20' },
+    { value: 25, label: '25' },
   ]
 
   const testMarks = [
-    {
-      value: 0,
-      label: '0',
-    },
-    {
-      value: 1,
-      label: '1',
-    },
-    {
-      value: 2,
-      label: '2',
-    },
-    {
-      value: 3,
-      label: '3',
-    },
-    {
-      value: 4,
-      label: '4',
-    },
+    { value: 0, label: '0' },
+    { value: 1, label: '1' },
+    { value: 2, label: '2' },
+    { value: 3, label: '3' },
+    { value: 4, label: '4' },
   ]
 
   function handleSubmit(e) {
@@ -110,28 +64,25 @@ function CourseCurriculumGenerator() {
       },
       method: 'POST',
       body: JSON.stringify({
-        subject: subject,
-        weeks: weeks,
-        chapters: chapters,
-        tests: tests,
-        finalExamOrProject: finalExamOrProject,
+        subject,
+        weeks,
+        chapters,
+        tests,
+        finalExamOrProject,
       }),
     })
       .then((res) => {
         setIsSubmitted(true)
-        // console.log(res.text())
         return res.text()
       })
       .then((html) => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
+        const parser = new DOMParser()
+        const doc = parser.parseFromString(html, 'text/html')
 
-        const paragraphElement = doc.querySelector('p').innerText;
-
-        const formattedResults = formatResults(paragraphElement);
+        const paragraphElement = doc.querySelector('p').innerText
+        const formattedResults = formatResults(paragraphElement)
         setResults(formattedResults)
         setIsLoading(false)
-        // console.log(data);
       })
       .catch((res) => {
         setIsLoading(false)
@@ -140,56 +91,8 @@ function CourseCurriculumGenerator() {
   }
 
   function formatResults(content) {
-    const myArray = content.split("###");
-    
-    const Items = myArray.map((item, index) => {
-      return (
-        <Typography variant="body1">{item}</Typography>
-      );
-    }); 
-
-    console.log(myArray);
-
-    return (
-      <>
-        <Items />
-      </>
-    )
+    return content.split('###')
   }
-
-  // function handleConvertToPDF() {
-  //     fetch('http://127.0.0.1:5000/handle_pdf', {
-  //         headers: {
-  //           'Accept': 'application/json',
-  //           'Content-Type': 'application/json'
-  //         },
-  //         method: "POST",
-  //         body: JSON.stringify({
-  //             results: results
-  //         })
-  //     })
-  //     .then(res => {
-  //         // setIsSubmitted(true);
-  //         // console.log(res.text())
-  //         return res.text();
-  //     })
-  //     .then(html => {
-  //         const parser = new DOMParser();
-  //         const doc = parser.parseFromString(html, 'text/html');
-
-  //         const paragraphElement = doc.querySelector('p').innerText;
-
-  //         setResults(paragraphElement);
-  //         setIsLoading(false);
-  //         // console.log(data);
-  //     })
-  //     .catch((res) => {
-  //         setIsLoading(false);
-  //         console.error(res);
-  //     });
-
-  //     console.log("test");
-  // }
 
   return (
     <>
@@ -207,11 +110,19 @@ function CourseCurriculumGenerator() {
       <div>
         {isLoading ? (
           // Render loading state
-          <CircularProgress / >
+          <CircularProgress />
         ) : isSubmitted ? (
           <>
-            {/* TO DO: Determine how to format string response from Back End in Front End */}
-            {results}
+            {results.map((result, index) => (
+              <Box key={index} mt={2} mb={2}>
+                <Typography variant="h6" gutterBottom>
+                  Week {index + 1}
+                </Typography>
+                <Paper elevation={3} style={{ padding: '16px' }}>
+                  <Typography variant="body1">{result}</Typography>
+                </Paper>
+              </Box>
+            ))}
 
             <br />
             <br />
@@ -223,9 +134,7 @@ function CourseCurriculumGenerator() {
               <Link
                 style={{ textDecoration: 'none' }}
                 to="/quiz_generator"
-                state={{
-                  results: results,
-                }}
+                state={{ results }}
               >
                 Quiz Generator
               </Link>
@@ -305,7 +214,7 @@ function CourseCurriculumGenerator() {
               />
               <br />
               <br />
-              <FormControl fullwidth>
+              <FormControl fullWidth>
                 <InputLabel id="exam-or-project-input">
                   Final Exam or Project?
                 </InputLabel>
