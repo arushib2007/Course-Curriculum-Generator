@@ -51,6 +51,8 @@ function QuizGenerator() {
     setLoadingQuiz(true)
     let topic = e.target.innerText
 
+    setSelectedSubject(topic) // Set selected subject
+
     fetch('http://127.0.0.1:5000/render_quiz', {
       headers: {
         Accept: 'application/json',
@@ -70,7 +72,6 @@ function QuizGenerator() {
         setQuizContent(myArray)
         setLoadingQuiz(false)
         setShowSubmitButton(true) // Show submit button after quiz is rendered
-        setSelectedSubject(topic) // Mark the selected subject
       })
       .catch((error) => {
         console.error('Error fetching quiz:', error)
