@@ -1,1 +1,1 @@
-web: gunicorn Course-Curriculum-Generator:app
+web: gunicorn Course_Curriculum_Generator:app
