@@ -105,7 +105,7 @@ function QuizGenerator() {
     e.preventDefault()
     setLoadingQuiz(true)
 
-    fetch('http://127.0.0.1:5000/submit_quiz', {
+    fetch('https://course-curriculum-generator-db9f1560d821.herokuapp.com/submit_quiz', {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
