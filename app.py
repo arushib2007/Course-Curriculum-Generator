@@ -7,7 +7,7 @@ from flask_cors import CORS, cross_origin
 # config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
 
 app = Flask(__name__)
-cors = CORS(app)
+cors = CORS(app, resources={r"/*": {"origins": "https://course-curriculum-generator.netlify.app"}})
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 from langchain.agents import initialize_agent
