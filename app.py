@@ -78,7 +78,7 @@ def about():
     return 'About My Application'
 
 @app.route("/handle_submit", methods = ['POST'])
-@cross_origin()
+@cross_origin(origin='https://course-curriculum-generator.netlify.app')
 def handle_submit():
     data = request.get_json()
 
