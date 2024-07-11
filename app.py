@@ -7,7 +7,7 @@ from flask_cors import CORS, cross_origin
 # config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
 
 app = Flask(__name__)
-cors = CORS(app, resources={r"/*": {"origins": "https://course-curriculum-generator.netlify.app"}})
+cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 from langchain.agents import initialize_agent
@@ -78,6 +78,7 @@ def about():
     return 'About My Application'
 
 @app.route("/handle_submit", methods = ['POST'])
+@cross_origin(origin='https://course-curriculum-generator.netlify.app')
 def handle_submit():
     data = request.get_json()
 
@@ -107,7 +108,7 @@ def handle_submit():
 #     return pdfkit.from_string(html, 'response.pdf', configuration=config)
 
 @app.route('/generate_quiz', methods= ['POST'])
-@cross_origin()
+@cross_origin(origin='https://course-curriculum-generator.netlify.app')
 def generate_quiz():
     data = request.get_json()
     chapters = data['chapters']
@@ -119,7 +120,7 @@ def generate_quiz():
     return render_template('results.html', agent_response=agent_response)
 
 @app.route('/render_quiz', methods = ['POST'])
-@cross_origin()
+@cross_origin(origin='https://course-curriculum-generator.netlify.app')
 def render_quiz():
     data = request.get_json()
     topic = data['topic']
@@ -131,7 +132,7 @@ def render_quiz():
     return render_template("results.html", agent_response=agent_response)
 
 @app.route('/submit_quiz', methods = ['POST'])
-@cross_origin()
+@cross_origin(origin='https://course-curriculum-generator.netlify.app')
 def submit_quiz():
     data = request.get_json()
 
