@@ -54,7 +54,7 @@ function CourseCurriculumGenerator() {
 
     setIsLoading(true)
 
-    fetch('https://course-curriculum-generator-db9f1560d821.herokuapp.com/handle_submit', {
+    fetch('https://c-c-gen-38395822746a.herokuapp.com/handle_submit', {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',

@@ -22,7 +22,7 @@ function QuizGenerator() {
   function requestChapters() {
     setLoadingSubjects(true)
 
-    fetch('http://127.0.0.1:5000/generate_quiz', {
+    fetch('https://c-c-gen-38395822746a.herokuapp.com/generate_quiz', {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ function QuizGenerator() {
 
     setSelectedSubject(topic) // Set selected subject
 
-    fetch('http://127.0.0.1:5000/render_quiz', {
+    fetch('https://c-c-gen-38395822746a.herokuapp.com/render_quiz', {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
@@ -105,7 +105,7 @@ function QuizGenerator() {
     e.preventDefault()
     setLoadingQuiz(true)
 
-    fetch('https://course-curriculum-generator-db9f1560d821.herokuapp.com/submit_quiz', {
+    fetch('https://c-c-gen-38395822746a.herokuapp.com/submit_quiz', {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
