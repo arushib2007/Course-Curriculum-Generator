@@ -9,7 +9,6 @@ function QuizGenerator() {
   const [loadingSubjects, setLoadingSubjects] = useState(false)
   const [loadingQuiz, setLoadingQuiz] = useState(false)
   const [quizContent, setQuizContent] = useState([])
-  const [quizResults, setQuizResults] = useState('')
   const [firstAnswer, setFirstAnswer] = useState('')
   const [secondAnswer, setSecondAnswer] = useState('')
   const [thirdAnswer, setThirdAnswer] = useState('')
@@ -22,7 +21,7 @@ function QuizGenerator() {
   function requestChapters() {
     setLoadingSubjects(true)
 
-    fetch('https://c-c-gen-38395822746a.herokuapp.com/generate_quiz', {
+    fetch('http://127.0.0.1:5000/generate_quiz', {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
@@ -38,7 +37,7 @@ function QuizGenerator() {
         const doc = parser.parseFromString(html, 'text/html')
         const paragraphElement = doc.querySelector('p').innerText
         const myArray = paragraphElement.split('*')
-        setResults(myArray)
+        setResults(myArray.filter((item) => item.trim())) // Filter out any empty items
         setLoadingSubjects(false)
       })
       .catch((error) => {
@@ -47,13 +46,11 @@ function QuizGenerator() {
       })
   }
 
-  function generateQuiz(e) {
+  function generateQuiz(topic) {
     setLoadingQuiz(true)
-    let topic = e.target.innerText
-
     setSelectedSubject(topic) // Set selected subject
 
-    fetch('https://c-c-gen-38395822746a.herokuapp.com/render_quiz', {
+    fetch('http://127.0.0.1:5000/render_quiz', {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
@@ -105,7 +102,7 @@ function QuizGenerator() {
     e.preventDefault()
     setLoadingQuiz(true)
 
-    fetch('https://c-c-gen-38395822746a.herokuapp.com/submit_quiz', {
+    fetch('http://127.0.0.1:5000/submit_quiz', {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
@@ -191,7 +188,26 @@ function QuizGenerator() {
         </Box>
       )}
 
-      {loadingSubjects ? (
+      {!loadingSubjects ? (
+        results.map(
+          (item) =>
+            item &&
+            selectedSubject !== item && ( // Check if item exists and is not selectedSubject
+              <div key={item}>
+                <Box mb={2}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => generateQuiz(item)}
+                    disabled={loadingQuiz}
+                  >
+                    {item}
+                  </Button>
+                </Box>
+              </div>
+            )
+        )
+      ) : (
         <>
           <Typography variant="body1">
             Please allow time for subjects to render...
@@ -200,22 +216,6 @@ function QuizGenerator() {
           <CircularProgress />
           <br />
         </>
-      ) : (
-        results.map((item, index) => (
-          <div key={index}>
-            {selectedSubject !== item && ( // Render button only if it's not the selected subject
-              <Box mb={2}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={generateQuiz}
-                >
-                  {item}
-                </Button>
-              </Box>
-            )}
-          </div>
-        ))
       )}
 
       <Box mt={2}>

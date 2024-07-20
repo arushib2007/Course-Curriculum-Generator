@@ -54,7 +54,7 @@ function CourseCurriculumGenerator() {
 
     setIsLoading(true)
 
-    fetch('https://c-c-gen-38395822746a.herokuapp.com/handle_submit', {
+    fetch('http://127.0.0.1:5000/handle_submit', {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
